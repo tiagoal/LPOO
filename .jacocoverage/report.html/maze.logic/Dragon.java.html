@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Dragon.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;Maze&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">maze.logic</a> &gt; <span class="el_source">Dragon.java</span></div><h1>Dragon.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package maze.logic;
+
+import static maze.logic.Direction.*;
+
+/**
+ *
+ * @author Tiago
+ */
+public class Dragon extends Actor{
+    
+    private boolean isDead;
+    private boolean isSleeping;
+    
+    public Dragon(int PosX, int PosY) {
+<span class="fc" id="L20">        super(PosX, PosY);</span>
+<span class="fc" id="L21">        isDead = false;</span>
+<span class="fc" id="L22">        isSleeping = false;</span>
+<span class="fc" id="L23">    }</span>
+    
+    public boolean isDead() {
+<span class="fc" id="L26">        return isDead;</span>
+    }
+    
+    public void kill() {
+<span class="fc" id="L30">        this.isDead = true;</span>
+<span class="fc" id="L31">    }</span>
+    
+    public boolean isSleeping() {
+<span class="nc" id="L34">        return isSleeping;</span>
+    }
+    
+    public void setNotSleeping() {
+<span class="nc" id="L38">        isSleeping = false;</span>
+<span class="nc" id="L39">    }</span>
+    
+    public void setSleeping() {
+<span class="nc" id="L42">        isSleeping = true;</span>
+<span class="nc" id="L43">    }</span>
+    
+    public void updatePosition(Direction direction) {
+        
+<span class="pc bpc" id="L47" title="2 of 5 branches missed.">        switch(direction) {</span>
+            case LEFT:
+<span class="fc" id="L49">                position.setX(position.getX() - 1);</span>
+<span class="fc" id="L50">                break;</span>
+            case RIGHT:
+<span class="fc" id="L52">                position.setX(position.getX() + 1);</span>
+<span class="fc" id="L53">                break;</span>
+            case UP:
+<span class="nc" id="L55">                position.setY(position.getY() - 1);</span>
+<span class="nc" id="L56">                break;</span>
+            case DOWN:
+<span class="nc" id="L58">                position.setY(position.getY() + 1);</span>
+<span class="nc" id="L59">                break;</span>
+            default:
+                break;
+        }
+            
+<span class="fc" id="L64">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

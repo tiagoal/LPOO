@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Board.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;Maze&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">maze.logic</a> &gt; <span class="el_source">Board.java</span></div><h1>Board.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package maze.logic;
+
+import java.util.Random;
+import java.util.Stack;
+import static maze.logic.Direction.*;
+import static maze.logic.GameMode.*;
+
+/**
+ *
+ * @author Tiago
+ */
+public class Board {
+    
+    private Dragon dragon;
+    private Sword sword;
+    private Hero hero;
+<span class="pc" id="L22">    private int[] exit = {9,5};</span>
+<span class="pc" id="L23">    private final Random sleepingRandom = new Random();</span>
+<span class="pc" id="L24">    private final Random moveRandom = new Random();</span>
+<span class="pc" id="L25">    private char[][] board = {{'X','X','X','X','X','X','X','X','X','X'},</span>
+                              {'X','H',' ',' ',' ',' ',' ',' ',' ','X'},
+                              {'X',' ','X','X',' ','X',' ','X',' ', 'X'},
+                              {'X','D','X','X',' ','X',' ','X',' ','X'},
+                              {'X',' ','X','X',' ','X',' ','X',' ','X'},
+                              {'X',' ',' ',' ',' ',' ',' ','X',' ','S'},
+                              {'X',' ','X','X',' ','X',' ','X',' ','X'},
+                              {'X',' ','X','X',' ','X',' ','X',' ','X'},
+                              {'X','E','X','X',' ',' ',' ',' ',' ','X'},
+                              {'X','X','X','X','X','X','X','X','X','X'}};
+    
+<span class="nc" id="L36">    public Board() {</span>
+<span class="nc" id="L37">        dragon = new Dragon(1,3);</span>
+<span class="nc" id="L38">        sword = new Sword(1,8);</span>
+<span class="nc" id="L39">        hero = new Hero(1,1);</span>
+<span class="nc" id="L40">    }</span>
+    
+<span class="fc" id="L42">    public Board(char[][] maze) {</span>
+<span class="fc" id="L43">        board = maze;</span>
+        
+        /*for(char[] line : maze) {
+            for(char element : line) {
+                
+                if(element == 'H') hero = new Hero()
+            }
+        } How to get position with enhanced loop?*/
+        
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        for(int i = 0; i &lt; maze.length; i++) {</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">            for(int j = 0; j &lt; maze[i].length; j++) {</span>
+                
+<span class="fc bfc" id="L55" title="All 2 branches covered.">                if(maze[i][j] == 'H') hero = new Hero(j,i);</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">                if(maze[i][j] == 'D') dragon = new Dragon(j,i);</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">                if(maze[i][j] == 'E') sword = new Sword(j,i);</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">                if(maze[i][j] == 'S') {</span>
+<span class="fc" id="L59">                    exit[0] = j;</span>
+<span class="fc" id="L60">                    exit[1] = i;</span>
+                }
+            }
+        }
+<span class="fc" id="L64">    }</span>
+    
+    public Hero getHero() {
+<span class="fc" id="L67">        return hero;</span>
+    }
+    
+    public Dragon getDragon() {
+<span class="fc" id="L71">        return dragon;</span>
+    }
+    
+    public int[] getExit() {
+<span class="fc" id="L75">        return exit;</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="fc" id="L80">        String str = &quot;&quot;;</span>
+        
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        for(int i = 0; i &lt; board.length; i++) {</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">            for(int j = 0; j &lt; board[i].length; j++)</span>
+<span class="fc" id="L84">                str += board[i][j] + &quot; &quot;;</span>
+<span class="fc" id="L85">            str += &quot;\n&quot;;</span>
+        }
+        
+<span class="fc" id="L88">        return str;</span>
+    }
+    
+    public void updateBoard(GameMode mode, String direction) {
+        
+<span class="pc bpc" id="L93" title="3 of 4 branches missed.">        switch(mode) {</span>
+            case STILL:
+<span class="nc" id="L95">                updateBoardStill(direction);</span>
+<span class="nc" id="L96">                break;</span>
+            case MOVING:
+<span class="fc" id="L98">                updateBoardMoving(direction);</span>
+<span class="fc" id="L99">                break;</span>
+            case MOVINGANDSLEEPING:
+<span class="nc" id="L101">                updateBoardMovingAndSleeping(direction);</span>
+<span class="nc" id="L102">                break;</span>
+            default:
+                break;
+        }
+            
+<span class="fc" id="L107">    }</span>
+    
+    
+    private void updateBoardStill(String direction) {
+        
+        
+<span class="nc" id="L113">        board[hero.getPoint().getY()][hero.getPoint().getX()] = ' ';</span>
+
+<span class="nc bnc" id="L115" title="All 4 branches missed.">        if(direction.equals(&quot;w&quot;) &amp;&amp; isPossibleToMove(UP, hero)) {</span>
+<span class="nc" id="L116">            hero.updatePosition(direction);</span>
+        }
+<span class="nc bnc" id="L118" title="All 4 branches missed.">        if(direction.equals(&quot;s&quot;) &amp;&amp; isPossibleToMove(DOWN, hero)) {</span>
+<span class="nc" id="L119">            hero.updatePosition(direction);</span>
+
+        }
+<span class="nc bnc" id="L122" title="All 4 branches missed.">        if(direction.equals(&quot;d&quot;) &amp;&amp; isPossibleToMove(RIGHT, hero)) {</span>
+<span class="nc" id="L123">            hero.updatePosition(direction);</span>
+
+        }
+<span class="nc bnc" id="L126" title="All 4 branches missed.">        if(direction.equals(&quot;a&quot;) &amp;&amp; isPossibleToMove(LEFT, hero)) {</span>
+<span class="nc" id="L127">            hero.updatePosition(direction);</span>
+        }        
+        
+<span class="nc bnc" id="L130" title="All 4 branches missed.">        if(hero.getPoint().getX() == sword.getPoint().getX() &amp;&amp; hero.getPoint().getY() == sword.getPoint().getY())</span>
+<span class="nc" id="L131">            hero.setHasSword();            </span>
+
+        
+<span class="nc bnc" id="L134" title="All 2 branches missed.">        if(dragonNear()) {</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">            if(hero.hasSword()) {</span>
+<span class="nc" id="L136">                dragon.kill();</span>
+<span class="nc" id="L137">                board[dragon.getPoint().getY()][dragon.getPoint().getX()] = ' ';</span>
+            } else {
+<span class="nc" id="L139">                hero.kill();</span>
+            }
+        }
+        
+<span class="nc bnc" id="L143" title="All 2 branches missed.">        if(!hero.isDead()) {</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">            if(hero.hasSword())</span>
+<span class="nc" id="L145">                board[hero.getPoint().getY()][hero.getPoint().getX()] = 'A';</span>
+            else
+<span class="nc" id="L147">                board[hero.getPoint().getY()][hero.getPoint().getX()] = 'H';</span>
+        }
+<span class="nc" id="L149">    }</span>
+    
+    private void updateBoardMoving(String direction) {
+        Direction dragonMove;
+
+<span class="fc" id="L154">        board[hero.getPoint().getY()][hero.getPoint().getX()] = ' ';</span>
+<span class="fc" id="L155">        board[dragon.getPoint().getY()][dragon.getPoint().getX()] = ' ';</span>
+
+        
+<span class="pc bpc" id="L158" title="1 of 4 branches missed.">        if(direction.equals(&quot;w&quot;) &amp;&amp; isPossibleToMove(UP, hero)) {</span>
+<span class="fc" id="L159">            hero.updatePosition(direction);</span>
+        }
+<span class="pc bpc" id="L161" title="1 of 4 branches missed.">        if(direction.equals(&quot;s&quot;) &amp;&amp; isPossibleToMove(DOWN, hero)) {</span>
+<span class="fc" id="L162">            hero.updatePosition(direction);</span>
+
+        }
+<span class="pc bpc" id="L165" title="1 of 4 branches missed.">        if(direction.equals(&quot;d&quot;) &amp;&amp; isPossibleToMove(RIGHT, hero)) {</span>
+<span class="fc" id="L166">            hero.updatePosition(direction);</span>
+
+        }
+<span class="pc bpc" id="L169" title="1 of 4 branches missed.">        if(direction.equals(&quot;a&quot;) &amp;&amp; isPossibleToMove(LEFT, hero)) {</span>
+<span class="fc" id="L170">            hero.updatePosition(direction);</span>
+        }        
+
+<span class="fc bfc" id="L173" title="All 4 branches covered.">        if(hero.getPoint().getX() == sword.getPoint().getX() &amp;&amp; hero.getPoint().getY() == sword.getPoint().getY())</span>
+<span class="fc" id="L174">            hero.setHasSword();</span>
+        
+        
+<span class="fc bfc" id="L177" title="All 2 branches covered.">        if(hero.hasSword())</span>
+<span class="fc" id="L178">            board[hero.getPoint().getY()][hero.getPoint().getX()] = 'A';</span>
+        else
+<span class="fc" id="L180">            board[hero.getPoint().getY()][hero.getPoint().getX()] = 'H';</span>
+        
+<span class="fc" id="L182">        dragonMove = randomDragonMove();</span>
+        
+<span class="fc bfc" id="L184" title="All 2 branches covered.">        if(!dragon.isDead()) {</span>
+                        
+<span class="fc" id="L186">            dragon.updatePosition(dragonMove);</span>
+            
+<span class="fc bfc" id="L188" title="All 2 branches covered.">            if (dragonNear()) {</span>
+<span class="pc bpc" id="L189" title="1 of 2 branches missed.">                if (hero.hasSword()) {</span>
+<span class="fc" id="L190">                    dragon.kill();</span>
+<span class="fc" id="L191">                    board[dragon.getPoint().getY()][dragon.getPoint().getX()] = ' ';</span>
+                } else {
+<span class="nc" id="L193">                    hero.kill();</span>
+                }
+            }
+        }
+        
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">        if(hero.isDead()) </span>
+<span class="nc" id="L199">            board[hero.getPoint().getY()][hero.getPoint().getX()] = ' ';</span>
+        
+<span class="fc bfc" id="L201" title="All 2 branches covered.">        if(!dragon.isDead()) {</span>
+            
+<span class="fc bfc" id="L203" title="All 2 branches covered.">            if(dragon.getPoint().getX() == sword.getPoint().getX() &amp;&amp;</span>
+<span class="pc bpc" id="L204" title="1 of 2 branches missed.">                    dragon.getPoint().getY() == sword.getPoint().getY())</span>
+<span class="nc" id="L205">                board[dragon.getPoint().getY()][dragon.getPoint().getX()] = 'F';</span>
+            else {
+<span class="fc" id="L207">                board[dragon.getPoint().getY()][dragon.getPoint().getX()] = 'D';</span>
+<span class="fc bfc" id="L208" title="All 2 branches covered.">                if(!hero.hasSword()) board[sword.getPoint().getY()][sword.getPoint().getX()] = 'E';</span>
+            }
+        }
+<span class="fc" id="L211">    }</span>
+    
+    private void updateBoardMovingAndSleeping(String direction) {
+<span class="nc" id="L214">        int sleeping = sleepingRandom.nextInt(8);</span>
+        Direction dragonMove;
+        
+<span class="nc" id="L217">        board[hero.getPoint().getY()][hero.getPoint().getX()] = ' ';</span>
+<span class="nc" id="L218">        board[dragon.getPoint().getY()][dragon.getPoint().getX()] = ' ';</span>
+
+        
+<span class="nc bnc" id="L221" title="All 4 branches missed.">        if(direction.equals(&quot;w&quot;) &amp;&amp; isPossibleToMove(UP, hero)) {</span>
+<span class="nc" id="L222">            hero.updatePosition(direction);</span>
+        }
+<span class="nc bnc" id="L224" title="All 4 branches missed.">        if(direction.equals(&quot;s&quot;) &amp;&amp; isPossibleToMove(DOWN, hero)) {</span>
+<span class="nc" id="L225">            hero.updatePosition(direction);</span>
+
+        }
+<span class="nc bnc" id="L228" title="All 4 branches missed.">        if(direction.equals(&quot;d&quot;) &amp;&amp; isPossibleToMove(RIGHT, hero)) {</span>
+<span class="nc" id="L229">            hero.updatePosition(direction);</span>
+
+        }
+<span class="nc bnc" id="L232" title="All 4 branches missed.">        if(direction.equals(&quot;a&quot;) &amp;&amp; isPossibleToMove(LEFT, hero)) {</span>
+<span class="nc" id="L233">            hero.updatePosition(direction);</span>
+        }        
+        
+<span class="nc bnc" id="L236" title="All 6 branches missed.">        if(!dragon.isDead() &amp;&amp; sleeping == 0 &amp;&amp; !dragon.isSleeping()) {</span>
+<span class="nc" id="L237">            board[dragon.getPoint().getY()][dragon.getPoint().getX()] = 'd';</span>
+<span class="nc" id="L238">            dragon.setSleeping();</span>
+        }
+        
+<span class="nc bnc" id="L241" title="All 4 branches missed.">        if(hero.getPoint().getX() == sword.getPoint().getX() &amp;&amp; hero.getPoint().getY() == sword.getPoint().getY())</span>
+<span class="nc" id="L242">            hero.setHasSword();    </span>
+        
+<span class="nc bnc" id="L244" title="All 2 branches missed.">        if(hero.hasSword())</span>
+<span class="nc" id="L245">            board[hero.getPoint().getY()][hero.getPoint().getX()] = 'A';</span>
+        else
+<span class="nc" id="L247">            board[hero.getPoint().getY()][hero.getPoint().getX()] = 'H';</span>
+        
+<span class="nc" id="L249">        dragonMove = randomDragonMove();</span>
+        
+<span class="nc bnc" id="L251" title="All 4 branches missed.">        if(!dragon.isDead() &amp;&amp; !dragon.isSleeping()) {</span>
+<span class="nc" id="L252">            dragon.updatePosition(dragonMove);</span>
+        }
+
+<span class="nc bnc" id="L255" title="All 2 branches missed.">        if(dragonNear()) {</span>
+<span class="nc bnc" id="L256" title="All 2 branches missed.">            if(hero.hasSword()) {</span>
+<span class="nc" id="L257">                dragon.kill();</span>
+<span class="nc" id="L258">                board[dragon.getPoint().getY()][dragon.getPoint().getX()] = ' ';</span>
+            }
+<span class="nc bnc" id="L260" title="All 2 branches missed.">            else if(!dragon.isSleeping())</span>
+<span class="nc" id="L261">                hero.kill();</span>
+        }
+        
+<span class="nc bnc" id="L264" title="All 2 branches missed.">        if(hero.isDead())</span>
+<span class="nc" id="L265">            board[hero.getPoint().getY()][hero.getPoint().getX()] = ' ';</span>
+        
+<span class="nc bnc" id="L267" title="All 2 branches missed.">        if(!dragon.isDead()) {</span>
+<span class="nc bnc" id="L268" title="All 2 branches missed.">            if(!dragon.isSleeping())</span>
+<span class="nc" id="L269">                board[dragon.getPoint().getY()][dragon.getPoint().getX()] = 'D';</span>
+            else
+<span class="nc" id="L271">                board[dragon.getPoint().getY()][dragon.getPoint().getX()] = 'd';</span>
+        }
+        
+<span class="nc bnc" id="L274" title="All 6 branches missed.">        if(!dragon.isDead() &amp;&amp; sleeping != 0 &amp;&amp; dragon.isSleeping()){</span>
+<span class="nc" id="L275">            board[dragon.getPoint().getY()][dragon.getPoint().getX()] = 'D';</span>
+<span class="nc" id="L276">            dragon.setNotSleeping();</span>
+        }
+<span class="nc" id="L278">    }</span>
+    
+    private boolean isPossibleToMove(Direction direction, Actor actor) {
+        
+<span class="pc bpc" id="L282" title="1 of 5 branches missed.">        switch(direction) {</span>
+            case UP:
+<span class="fc bfc" id="L284" title="All 2 branches covered.">                return (board[actor.getPoint().getY() - 1][actor.getPoint().getX()] == ' ' ||</span>
+<span class="pc bpc" id="L285" title="1 of 2 branches missed.">                            board[actor.getPoint().getY() - 1][actor.getPoint().getX()] == 'S' ||</span>
+<span class="pc bpc" id="L286" title="1 of 2 branches missed.">                            board[actor.getPoint().getY() - 1][actor.getPoint().getX()] == 'E');</span>
+            case DOWN:
+<span class="fc bfc" id="L288" title="All 2 branches covered.">                return (board[actor.getPoint().getY() + 1][actor.getPoint().getX()] == ' ' ||</span>
+<span class="pc bpc" id="L289" title="1 of 2 branches missed.">                            board[actor.getPoint().getY() + 1][actor.getPoint().getX()] == 'S' ||</span>
+<span class="pc bpc" id="L290" title="1 of 2 branches missed.">                            board[actor.getPoint().getY() + 1][actor.getPoint().getX()] == 'E');</span>
+            case LEFT:
+<span class="fc bfc" id="L292" title="All 2 branches covered.">                return (board[actor.getPoint().getY()][actor.getPoint().getX() - 1] == ' ' ||</span>
+<span class="pc bpc" id="L293" title="1 of 2 branches missed.">                            board[actor.getPoint().getY()][actor.getPoint().getX() - 1] == 'S' ||</span>
+<span class="fc bfc" id="L294" title="All 2 branches covered.">                            board[actor.getPoint().getY()][actor.getPoint().getX() - 1] == 'E');</span>
+            case RIGHT:
+<span class="fc bfc" id="L296" title="All 2 branches covered.">                return (board[actor.getPoint().getY()][actor.getPoint().getX() + 1] == ' ' ||</span>
+<span class="pc bpc" id="L297" title="1 of 2 branches missed.">                            board[actor.getPoint().getY()][actor.getPoint().getX() + 1] == 'S' ||</span>
+<span class="pc bnc" id="L298" title="All 2 branches missed.">                            board[actor.getPoint().getY()][actor.getPoint().getX() + 1] == 'E');</span>
+            default:
+<span class="nc" id="L300">                return false;</span>
+        }
+    }
+    
+    private Direction randomDragonMove() {
+<span class="fc" id="L305">        Stack&lt;Direction&gt; possibleDragonMoves = new Stack&lt;&gt;();</span>
+<span class="fc" id="L306">        Random random = new Random();</span>
+        
+<span class="pc bpc" id="L308" title="1 of 2 branches missed.">        if(isPossibleToMove(UP, dragon))</span>
+<span class="nc" id="L309">            possibleDragonMoves.push(UP);</span>
+        
+<span class="fc bfc" id="L311" title="All 2 branches covered.">        if(isPossibleToMove(DOWN, dragon))</span>
+<span class="fc" id="L312">            possibleDragonMoves.push(DOWN);</span>
+        
+<span class="fc bfc" id="L314" title="All 2 branches covered.">        if(isPossibleToMove(LEFT, dragon))</span>
+<span class="fc" id="L315">            possibleDragonMoves.push(LEFT);</span>
+        
+<span class="pc bpc" id="L317" title="1 of 2 branches missed.">        if(isPossibleToMove(RIGHT, dragon))</span>
+<span class="fc" id="L318">            possibleDragonMoves.push(RIGHT);</span>
+        
+<span class="fc" id="L320">        possibleDragonMoves.push(STAY);</span>
+        
+<span class="fc" id="L322">        int randomMove = random.nextInt(possibleDragonMoves.size());</span>
+        
+<span class="fc bfc" id="L324" title="All 2 branches covered.">        for(int i = 0; i &lt; randomMove; i++)</span>
+<span class="fc" id="L325">            possibleDragonMoves.pop();</span>
+        
+<span class="fc" id="L327">        return possibleDragonMoves.lastElement();</span>
+        
+    }
+    
+    public boolean dragonNear() {
+        
+<span class="fc bfc" id="L333" title="All 2 branches covered.">        if(dragon.getPoint().getX() == hero.getPoint().getX())</span>
+<span class="pc bpc" id="L334" title="3 of 4 branches missed.">            if(dragon.getPoint().getY() &gt;= (hero.getPoint().getY() - 1) &amp;&amp; dragon.getPoint().getY() &lt;= (hero.getPoint().getY() + 1))</span>
+<span class="nc" id="L335">                return true;</span>
+        
+<span class="fc bfc" id="L337" title="All 2 branches covered.">        if(dragon.getPoint().getY() == hero.getPoint().getY())</span>
+<span class="pc bpc" id="L338" title="1 of 4 branches missed.">            if(dragon.getPoint().getX() &gt;= (hero.getPoint().getX() - 1) &amp;&amp; dragon.getPoint().getX() &lt;= (hero.getPoint().getX() + 1))</span>
+<span class="fc" id="L339">                return true;</span>
+        
+<span class="fc" id="L341">        return false;</span>
+    }
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
